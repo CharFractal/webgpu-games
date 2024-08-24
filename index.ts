@@ -7,35 +7,47 @@ const init = async () => {
 
   console.log("WebGPU is supported");
 
-  const canvas : HTMLCanvasElement= document.getElementById("canvas") as HTMLCanvasElement;
+  const canvas: HTMLCanvasElement = document.getElementById("canvas") as HTMLCanvasElement;
   if (!canvas) {
     throw Error("Canvas element not found.");
   }
 
-  const adapter : GPUAdapter = <GPUAdapter>await navigator.gpu.requestAdapter();
+  const adapter: GPUAdapter = <GPUAdapter>await navigator.gpu.requestAdapter();
   if (!adapter) {
     throw Error("Failed to get GPU adapter heheha.");
   }
 
-  const device  : GPUDevice= <GPUDevice>await adapter.requestDevice();
+  const device: GPUDevice = <GPUDevice>await adapter.requestDevice();
   if (!device) {
     throw Error("Failed to get GPU device.");
   }
 
-  const context : GPUCanvasContext = <GPUCanvasContext> canvas.getContext("webgpu") as GPUCanvasContext;
+  const context: GPUCanvasContext = <GPUCanvasContext>canvas.getContext("webgpu") as GPUCanvasContext;
   if (!context) {
     throw Error("Failed to get WebGPU context.");
   }
 
-  const format : GPUTextureFormat = "bgra8unorm";
+  const format: GPUTextureFormat = "bgra8unorm";
 
   context.configure({
     device: device,
-    format: format
+    format: format,
+    alphaMode: "opaque"
+  });
+  const bindGroupLayout = device.createBindGroupLayout({
+    entries: [],
+  });
+  const bindGroup = device.createBindGroup({
+    layout: bindGroupLayout,
+    entries: []
+  });
+
+  const pipelineLayout = device.createPipelineLayout({
+    bindGroupLayouts: [bindGroupLayout]
   });
 
   const pipeline = device.createRenderPipeline({
-    layout: "auto",
+    layout: pipelineLayout,
     vertex: {
       module: device.createShaderModule({
         code: shader
@@ -53,7 +65,7 @@ const init = async () => {
     },
     primitive: {
       topology: "triangle-list"
-    }
+    },
   });
 
   const commandEncoder = device.createCommandEncoder();
@@ -62,15 +74,16 @@ const init = async () => {
   const renderPass = commandEncoder.beginRenderPass({
     colorAttachments: [{
       view: textureView,
-      clearValue: {r: 0.5, g: 0.0, b: 0.25, a: 1.0},
+      clearValue: { r: 0.5, g: 0.0, b: 0.25, a: 1.0 },
       loadOp: "clear",
       storeOp: "store"
     }]
   });
 
   renderPass.setPipeline(pipeline);
+  renderPass.setBindGroup(0, bindGroup)
   renderPass.draw(3, 1, 0, 0);
-
+  renderPass.end();
   device.queue.submit([commandEncoder.finish()]);
 };
 
