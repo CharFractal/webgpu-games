@@ -1,19 +1,29 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title> Raycasting in typescript</title>
-    <style>
-      #canvas{
-        position: absolute;
-        left : 50%;
-        top : 50%;
-        transform: translate(-50%,-50%);
-      }
-    </style>
-  </head>
-  <body>
-    <canvas id="canvas"></canvas>
-    <script src="dist/bundle.js"></script>
-  </body>
-</html>
 
+<head>
+  <title> Raycasting in typescript</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">RAYTRACING</div>
+    <canvas id="canvas"></canvas>
+    <div class="console">
+      <div class="container">
+        <div class="info" id="mouseX">MouseX : </div>
+        <div class="info" id="mouseY">MouseY : </div>
+      </div>
+      <div class="container">
+        <div class="info" id="keyUp">Key Input : </div>
+        <div class="info" id="keyDown">Key Input : </div>
+
+      </div>
+      <div class="info" id="fps">FPS : </div>
+    </div>
+  </div>
+  <script src="dist/bundle.js"></script>
+</body>
+
+</html>

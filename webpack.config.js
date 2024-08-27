@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  entry: './index.ts',  // Your main TypeScript file
+  entry: './src/index.ts',
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist')
@@ -9,21 +9,20 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.ts$/,  // Correct regex for TypeScript files
+        test: /\.ts$/,
         exclude: /node_modules/,
         use: {
-          loader: 'ts-loader'  // Uses ts-loader for TypeScript files
+          loader: 'ts-loader'
         }
       },
       {
-        test: /\.wgsl$/,  // Correct regex for WGSL files
-        use: 'raw-loader'  // Use raw-loader to load WGSL files as raw text
+        test: /\.wgsl$/,
+        use: 'raw-loader'
       }
     ]
   },
   resolve: {
-    extensions: ['.ts', '.js', '.wgsl']  // Resolve TypeScript and WGSL files
+    extensions: ['.ts', '.wgsl']
   },
-  mode: 'development'  // Change to 'production' for optimized builds
+  mode: 'development'
 };
-
