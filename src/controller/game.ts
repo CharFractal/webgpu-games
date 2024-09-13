@@ -13,6 +13,7 @@ export class Game {
 
     forwardsAmount: number;
     rightAmount: number
+    upAmount: number;
 
     constructor(canvas: HTMLCanvasElement) {
 
@@ -22,6 +23,7 @@ export class Game {
 
         this.forwardsAmount = 0;
         this.rightAmount = 0;
+        this.upAmount = 0;
 
         this.keyUpLabel = <HTMLElement>document.getElementById("keyUp");
         this.keyDownLabel = <HTMLElement>document.getElementById("keyDown");
@@ -43,13 +45,10 @@ export class Game {
         var running: boolean = true;
 
         this.scene.update();
-        console.log(this.forwardsAmount);
-        console.log(this.rightAmount);
-        this.scene.movePlayer(this.forwardsAmount, this.rightAmount);
+        this.scene.movePlayer(this.forwardsAmount, this.rightAmount, this.upAmount);
 
         this.renderer.render(
-            this.scene.getPlayer(),
-            this.scene.getTriangles(),
+            this.scene.getRenderables()
         );
         if (running) {
             requestAnimationFrame(this.run);
@@ -71,6 +70,8 @@ export class Game {
                 case 'KeyS': this.forwardsAmount -= 0.1; break;
                 case 'KeyA': this.rightAmount -= 0.1; break;
                 case 'KeyD': this.rightAmount += 0.1; break;
+                case 'KeyQ': this.upAmount += 0.1; break;
+                case 'KeyE': this.upAmount -= 0.1; break;
             }
         }
     }
@@ -84,6 +85,8 @@ export class Game {
                 case 'KeyS': this.forwardsAmount = 0; break;
                 case 'KeyA': this.rightAmount = 0; break;
                 case 'KeyD': this.rightAmount = 0; break;
+                case 'KeyQ': this.upAmount = 0; break;
+                case 'KeyE': this.upAmount = 0; break;
             }
         }
     }

@@ -34,8 +34,7 @@ export class TriangleMesh {
                 shaderLocation: 1,
                 format: "float32x2",
                 offset: 12
-            }
-            ]
+            }]
         }
     }
 }

@@ -2,8 +2,9 @@ export class Material {
     texture!: GPUTexture;
     view!: GPUTextureView;
     sampler!: GPUSampler;
+    bindGroup!: GPUBindGroup;
 
-    async initialize(device: GPUDevice, url: string) {
+    async initialize(device: GPUDevice, url: string, bindGroupLayout: GPUBindGroupLayout) {
         const response: Response = await fetch(url);
         const blob = await response.blob();
         const ImageData: ImageBitmap = await createImageBitmap(blob);
@@ -19,7 +20,7 @@ export class Material {
             baseArrayLayer: 0,
             arrayLayerCount: 1,
         }
-        this.view = this.texture.createView(viewDescriptor);
+        this.view = this.texture.createView(viewDescriptor);//----------------------------------IMAGE VIEW
 
         const samplerDescriptor: GPUSamplerDescriptor = {
             addressModeU: "repeat",
@@ -29,7 +30,20 @@ export class Material {
             mipmapFilter: "nearest",
             maxAnisotropy: 1,
         }
-        this.sampler = device.createSampler(samplerDescriptor);
+        this.sampler = device.createSampler(samplerDescriptor);//--------------------------------IMAGE SAMPLER
+        this.bindGroup = device.createBindGroup({
+            layout: bindGroupLayout,
+            entries: [
+                {
+                    binding: 0,
+                    resource: this.view,
+                },
+                {
+                    binding: 1,
+                    resource: this.sampler,
+                },
+            ]
+        });
     }
     async loadImageBitmap(device: GPUDevice, imageData: ImageBitmap) {
         const textureDescriptor: GPUTextureDescriptor = {
