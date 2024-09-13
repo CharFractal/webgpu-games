@@ -13,8 +13,8 @@ const App = async () => {
   if (!canvas) {
     throw Error("Canvas element not found.");
   }
-  canvas.width = window.outerWidth;
-  canvas.height = window.outerHeight * 0.75;
+  canvas.width = 720;
+  canvas.height = 720;
 
   const game = new Game(canvas);
   game.initialize().then(() => game.run());

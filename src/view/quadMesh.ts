@@ -6,13 +6,14 @@ export class QuadMesh {
     constructor(device: GPUDevice) {
         // x y z u v
         const vertices: Float32Array = new Float32Array([
-            -0.5, -0.5, 0.0, 0.0, 0.0,
-            0.5, -0.5, 0.0, 1.0, 0.0,
-            0.5, 0.5, 0.0, 1.0, 1.0,
-            0.5, 0.5, 0.0, 1.0, 1.0,
-            -0.5, 0.5, 0.0, 0.0, 1.0,
-            -0.5, -0.5, 0.0, 0.0, 0.0,
-        ])
+            -1.0, -1.0, 0.0, 0.0, 0.0,  // Bottom-left
+            1.0, -1.0, 0.0, 1.0, 0.0,   // Bottom-right
+            1.0, 1.0, 0.0, 1.0, 1.0,    // Top-right
+            1.0, 1.0, 0.0, 1.0, 1.0,    // Top-right (repeated)
+            -1.0, 1.0, 0.0, 0.0, 1.0,   // Top-left
+            -1.0, -1.0, 0.0, 0.0, 0.0   // Bottom-left (repeated)
+        ]);
+
 
         const usage: GPUBufferUsageFlags = GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST;
         const descriptor: GPUBufferDescriptor = {

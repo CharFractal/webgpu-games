@@ -2,7 +2,8 @@ import { mat4 } from "gl-matrix";
 
 export enum ObjectTypes {
     TRIANGLE,
-    QUAD,
+    FLOOR,
+    WALL,
 };
 
 export interface RenderData {

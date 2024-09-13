@@ -6,55 +6,78 @@ import { ObjectTypes, RenderData } from "./definitions";
 import { Cube } from "./cube";
 
 export class Scene {
-    triangles!: Triangle[];
-    quads!: Quad[];
-    cube!: Cube;
     player!: Camera;
     objectData!: Float32Array;
+    objectIndex!: number;
+
+    triangles!: Triangle[];
     triangleCount!: number;
-    quadCount!: number;
+
+    floorTiles!: Quad[];
+    floorTileCount!: number;
+
+    wallTiles!: Quad[];
+    wallTileCount!: number;
 
     constructor() {
         this.objectData = new Float32Array(16 * 1024);
+        this.objectIndex = 0;
+
         this.triangles = [];
-        this.quads = [];
         this.triangleCount = 0;
-        this.quadCount = 0;
+
+        this.floorTiles = [];
+        this.floorTileCount = 0;
+
+        this.wallTiles = [];
+        this.wallTileCount = 0;
 
         this.player = new Camera([-2, 0, 0.5], 0, 0)
 
         this.makeTrinagles();
-        this.makeQuads();
-        this.cube = new Cube([5, 0, 1], [0, 0, 0]);
+        this.makeFloor();
+        this.makeWall();
     }
+    private makeWall() {
+        let wall: Quad = new Quad([0.0, 0.0, 1.0]);
+        wall.eulers[1] = 0.5;
+        wall.eulers[0] = 0.5;
 
-    private makeQuads() {
-        let i = this.triangleCount;
+        this.wallTiles.push(wall)
+        let blankMatrix = mat4.create();
+        for (var j = 0; j < 16; ++j) {
+            this.objectData[(16 * this.objectIndex) + j] = <number>blankMatrix.at(j);
+        }
+        this.objectIndex++;
+        this.wallTileCount++;
+    }
+    private makeFloor() {
         for (let x = -10; x < 10; ++x) {
             for (let y = -10; y < 10; ++y) {
-                this.quads.push(
-                    new Quad([x, y, -0.5])
-                );
-                let blankMatrix = mat4.create();
-                for (var j = 0; j < 16; ++j) {
-                    this.objectData[(16 * i) + j] = <number>blankMatrix.at(j);
+                if (x % 2 == 0 && y % 2 == 0) {
+                    this.floorTiles.push(
+                        new Quad([x, y, -0.5])
+                    );
+                    let blankMatrix = mat4.create();
+                    for (var j = 0; j < 16; ++j) {
+                        this.objectData[(16 * this.objectIndex) + j] = <number>blankMatrix.at(j);
+                    }
+                    this.objectIndex++;
+                    this.floorTileCount++;
                 }
-                i++;
-                this.quadCount++;
             }
         }
     }
     private makeTrinagles() {
-        let i = 0;
         for (let y = -5; y <= 5; ++y) {
             this.triangles.push(
                 new Triangle([2, y, 0], 0)// pos, theta
             );
             let blankMatrix = mat4.create();
             for (var j = 0; j < 16; ++j) {
-                this.objectData[(16 * i) + j] = <number>blankMatrix.at(j);
+                this.objectData[(16 * this.objectIndex) + j] = <number>blankMatrix.at(j);
             }
-            i++;
+            this.objectIndex++;
             this.triangleCount++;
         }
     }
@@ -71,7 +94,18 @@ export class Scene {
                 ++i;
             }
         )
-        this.quads.forEach(
+        this.floorTiles.forEach(
+            (quad) => {
+                // quad.eulers[0] += 0.001;
+                quad.update();
+                let model = quad.getModel();
+                for (let j = 0; j < 16; ++j) {
+                    this.objectData[(i * 16) + j] = <number>model.at(j);
+                }
+                ++i;
+            }
+        )
+        this.wallTiles.forEach(
             (quad) => {
                 quad.update();
                 let model = quad.getModel();
@@ -81,13 +115,6 @@ export class Scene {
                 ++i;
             }
         )
-        this.cube.update();
-        let model = this.cube.getModel();
-        for (let j = 0; j < 16; ++j) {
-            this.objectData[(i * 16) + j] = <number>model.at(j);
-        }
-        ++i;
-
         this.player.update();
     }
 
@@ -128,7 +155,8 @@ export class Scene {
             modelTransforms: this.objectData,
             objectCount: {
                 [ObjectTypes.TRIANGLE]: this.triangleCount,
-                [ObjectTypes.QUAD]: this.quadCount,
+                [ObjectTypes.FLOOR]: this.floorTileCount,
+                [ObjectTypes.WALL]: this.wallTileCount,
             }
         }
     }
